@@ -1,18 +1,20 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
+#include<iostream>
+
 using namespace std;
 
-class prajitura {
-public:
+class Prajitura {
+private://incapsulare=punem in pv ca sa nu aiba accs toata lumea
 	char* denumire;
 	float pret;
 	int cantitate;
 	bool dePost;
 	int nrIngrediente;
 	string* ingrediente;
-	//const id;
 	const int id;
-	prajitura() {
+	static int contor;//apartine clasei, nu obiectului
+public:
+	Prajitura() :id(contor++) {
 		this->denumire = new char[strlen("Tiramisu") + 1];
 		strcpy(denumire, "Tiramisu");
 		this->pret = 15;
@@ -24,34 +26,103 @@ public:
 		this->ingrediente[1] = "vanilie";
 		this->ingrediente[2] = "cafea";
 	}
-
-	prajitura(const char* denumire, float pret) {
-
-		float calculeazaCantitateTotala(Prajitura * prajituri, int nr_prajituri)
+	Prajitura(const char* denumire, float pret) :id(contor++) {
+		this->denumire = new char[strlen(denumire) + 1];
+		strcpy(this->denumire, denumire);
+		this->pret = pret;
+		this->cantitate = 250;
+		this->dePost = true;
+		this->nrIngrediente = 3;
+		this->ingrediente = new string[this->nrIngrediente];
+		this->ingrediente[0] = "piscoturi";
+		this->ingrediente[1] = "vanilie";
+		this->ingrediente[2] = "cafea";
+	}
+	Prajitura(const Prajitura& p) :id(contor++)
+	{
+		this->denumire = new char[strlen(p.denumire) + 1];
+		strcpy(this->denumire, p.denumire);
+		this->pret = p.pret;
+		this->cantitate = p.cantitate;
+		this->dePost = p.dePost;
+		this->nrIngrediente = p.nrIngrediente;
+		this->ingrediente = new string[this->nrIngrediente];
+		for (int i = 0; i < this->nrIngrediente; i++)
 		{
-			float greutate = 0;
-			for (int p = 0; p < nr_prajituri; p++)
-				greutate += prajituri[p].cantitate;
-			return greutate;
+			this->ingrediente[i] = p.ingrediente[i];
 		}
-		void main() {
-			prajitura p;
-			prajitura p2("Amandina", 40);
-			p.afisare();
-			p2.afisare();
-			cout << p.costMediuGram();
-			prajitura* prajituri;
-			prajituri = new prajitura[3];
-			prajituri[2].afisare();
-			prajituri[1].pret = 50;
-			prajituri[2].cantitate = 70;
+	}
+	~Prajitura();
 
-			prajituri[0].modificaDenumire("Tort");
-			prajituri[1].modificaDenumire("Ecler");
-
-			for (int i = 0; i < 3; i++) {
-				cout << prajituri[i].denumire << ' ' << prajituri[i].costMediuGram() << endl;
-			}
-			float greutate_totala = calculeazaCantitateTotala(prajituri, 3);
-			cout << "Total: " << greutate_totala << endl;
+	int getCantitate() {
+		return this->cantitate;
+	}
+	int getnrIngrediente() {
+		return this->nrIngrediente;
+	}
+	float getPret() {
+		return this->pret;
+	}
+	static int getcontor() {
+		return contor;
+	}
+	void afisare()
+	{
+		cout << "Denumire: " << this->denumire << endl;
+		cout << "Pret: " << this->pret << endl;
+		cout << "Cantitate: " << this->cantitate << endl;
+		cout << "De Post: " << (this->dePost ? "DA" : "NU") << endl;
+		cout << "Nr ingrediente: " << this->nrIngrediente << endl;
+		cout << "Ingredientele sunt: ";
+		for (int i = 0; i < this->nrIngrediente; i++)
+		{
+			cout << this->ingrediente[i] << "; ";
 		}
+		cout << endl;
+
+	}
+	float costMediuGram() {
+		if (this->cantitate == 0) {
+			return 0;
+		}
+		else {
+			return this->pret / this->cantitate;
+		}
+	}
+
+	void modificaDenumire(const char* denumire) {
+		delete this->denumire;
+
+		this->denumire = new char[strlen(denumire) + 1];
+		strcpy(this->denumire, denumire);
+	}
+
+
+};
+int Prajitura::contor = 100;//::=operator de rezolutie
+
+Prajitura::~Prajitura() {//destructor
+	delete[] this->denumire;
+	delete[] this->ingrediente;
+}
+float calculeazaCantitateTotala(Prajitura* prajituri, int nr_prajituri) {
+	float greutate = 0;
+
+	for (int p = 0; p < nr_prajituri; p++)
+		greutate += prajituri[p].getCantitate();
+
+	return greutate;
+}
+
+float calculeazaPretPerIngredient(Prajitura p)
+{
+	if (p.getnrIngrediente() != 0)
+		return p.getPret() / p.getnrIngrediente();
+	return 0;
+}
+void main() {
+	Prajitura p;
+	p.afisare();
+	Prajitura::getcontor();
+	cout << calculeazaPretPerIngredient(p);
+}
