@@ -1,6 +1,6 @@
+//ESTE DE FAPT AL 4 LEA SEMINAR, IN CONTINUAREA CELUI DE AL 3 LEA
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
-
 using namespace std;
 
 class Prajitura {
